@@ -41,14 +41,14 @@ def getUsers():
     # Show only activated users
     # filter = '(&(memberOf=cn=workers,cn=users,dc=example,dc=com)(!(userAccountControl=66050)))'
     filter_users = '(&(objectclass=person)(objectclass=user)(objectclass=organizationalPerson)(!(objectclass=computer))(!(userAccountControl:1.2.840.113556.1.4.803:=2)))'
-    attrs_users = ['cn', 'sAMAccountName', 'givenname', 'sn', 'mail', 'description', 'distinguishedName', 'telephonenumber', 'homephone', 'mobile', 'objectclass', 'userAccountControl']
+    attrs_users = ['sAMAccountName', 'cn', 'givenname', 'sn', 'description', 'mail', 'distinguishedName', 'telephonenumber', 'homephone', 'mobile', 'objectclass', 'userAccountControl']
     entries = search(filter_users, attrs_users)
     normalize(entries, output_users, attrs_users)
 
 
 def getGroups():
     filter_grps = '(&(objectCategory=group))'
-    attrs_grps = ['cn', 'sAMAccountName', 'givenname', 'sn', 'mail', 'description', 'distinguishedName', 'objectclass']
+    attrs_grps = ['sAMAccountName', 'cn', 'givenname', 'sn', 'description', 'mail', 'distinguishedName', 'objectclass']
     entries = search(filter_grps, attrs_grps)
     normalize(entries, output_groups, attrs_grps)
     getMembers(entries)
@@ -58,7 +58,7 @@ def getMembers(groups_entries):
         cn=str(group['cn'].values)[2:-2]
         dn=str(group['distinguishedName'].values)[2:-2]
         filter_grps_members='(&(objectCategory=user)(memberOf='+dn+')(!(userAccountControl:1.2.840.113556.1.4.803:=2)))'
-        attrs_grps_members = ['cn', 'sAMAccountName', 'givenname', 'sn', 'mail', 'description', 'distinguishedName', 'objectclass']
+        attrs_grps_members = ['sAMAccountName', 'cn', 'givenname', 'sn', 'description', 'mail', 'distinguishedName', 'objectclass']
         entries = search(filter_grps_members, attrs_grps_members)
         individual_file = output_members_group + str(cn) + '.csv'
         normalize(entries, individual_file, attrs_grps_members)
