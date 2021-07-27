@@ -22,8 +22,9 @@ def search(filter, attrs):
     return entries
 
 
-def normalize(entries, file):
+def normalize(entries, file, headers):
     data=[]
+    data.append(str(headers).replace(',',';').replace('\'','')[1:-1])
     for i in entries:
         row=str(i['sAMAccountName'].values)[2:-2]+';'+str(i['cn'].values)[2:-2]+';'+str(i['givenname'].values)[2:-2]+';'+str(i['sn'].values)[2:-2]+';'+str(i['description'].values)[2:-2]+';'+str(i['mail'].values)[2:-2]
         data.append(row)
@@ -40,16 +41,16 @@ def getUsers():
     # Show only activated users
     # filter = '(&(memberOf=cn=workers,cn=users,dc=example,dc=com)(!(userAccountControl=66050)))'
     filter_users = '(&(objectclass=person)(objectclass=user)(objectclass=organizationalPerson)(!(objectclass=computer))(!(userAccountControl:1.2.840.113556.1.4.803:=2)))'
-    attrs_users = ['cn', 'sAMAccountName', 'givenname', 'sn', 'mail', 'description', 'telephonenumber', 'homephone', 'mobile', 'objectclass', 'userAccountControl']
+    attrs_users = ['cn', 'sAMAccountName', 'givenname', 'sn', 'mail', 'description', 'distinguishedName', 'telephonenumber', 'homephone', 'mobile', 'objectclass', 'userAccountControl']
     entries = search(filter_users, attrs_users)
-    normalize(entries, output_users)
+    normalize(entries, output_users, attrs_users)
 
 
 def getGroups():
     filter_grps = '(&(objectCategory=group))'
-    attrs_grps = ['cn', 'sAMAccountName', 'givenname', 'sn', 'mail', 'description', 'objectclass', 'distinguishedName']
+    attrs_grps = ['cn', 'sAMAccountName', 'givenname', 'sn', 'mail', 'description', 'distinguishedName', 'objectclass']
     entries = search(filter_grps, attrs_grps)
-    normalize(entries, output_groups)
+    normalize(entries, output_groups, attrs_grps)
     getMembers(entries)
 
 def getMembers(groups_entries):
@@ -57,10 +58,10 @@ def getMembers(groups_entries):
         cn=str(group['cn'].values)[2:-2]
         dn=str(group['distinguishedName'].values)[2:-2]
         filter_grps_members='(&(objectCategory=user)(memberOf='+dn+')(!(userAccountControl:1.2.840.113556.1.4.803:=2)))'
-        attrs_grps_members = ['cn', 'sAMAccountName', 'givenname', 'sn', 'mail', 'description', 'objectclass', 'distinguishedName']
+        attrs_grps_members = ['cn', 'sAMAccountName', 'givenname', 'sn', 'mail', 'description', 'distinguishedName', 'objectclass']
         entries = search(filter_grps_members, attrs_grps_members)
         individual_file = output_members_group + str(cn) + '.csv'
-        normalize(entries, individual_file)
+        normalize(entries, individual_file, attrs_grps_members)
 
 getUsers()
 getGroups()
