@@ -56,7 +56,7 @@ def getMembers(groups_entries):
     for group in groups_entries:
         cn=str(group['cn'].values)[2:-2]
         dn=str(group['distinguishedName'].values)[2:-2]
-        filter_grps_members='(&(objectCategory=user)(memberOf='+dn+'))'
+        filter_grps_members='(&(objectCategory=user)(memberOf='+dn+')(!(userAccountControl:1.2.840.113556.1.4.803:=2)))'
         attrs_grps_members = ['cn', 'sAMAccountName', 'givenname', 'sn', 'mail', 'description', 'objectclass', 'distinguishedName']
         entries = search(filter_grps_members, attrs_grps_members)
         individual_file = output_members_group + str(cn) + '.csv'
